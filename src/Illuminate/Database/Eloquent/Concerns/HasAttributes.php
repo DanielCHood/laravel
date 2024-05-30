@@ -170,6 +170,12 @@ trait HasAttributes
     protected static $setAttributeMutatorCache = [];
 
     /**
+     * The cache of the `get{key}Attribute` method existing for each class.
+     * @see self::hasGetMutator
+     */
+    protected static $hasGetMutatorCache = [];
+
+    /**
      * The cache of the converted cast types.
      *
      * @var array
@@ -629,7 +635,13 @@ trait HasAttributes
      */
     public function hasGetMutator($key)
     {
-        return method_exists($this, 'get'.Str::studly($key).'Attribute');
+        $className = get_class($this);
+        if (isset(static::$hasGetMutatorCache[$className][$key])) {
+            return static::$hasGetMutatorCache[$className][$key];
+        }
+
+        return static::$hasGetMutatorCache[$className][$key] =
+            method_exists($this, 'get'.Str::studly($key).'Attribute');
     }
 
     /**
